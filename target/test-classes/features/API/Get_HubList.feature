@@ -9,3 +9,5 @@ Feature:As an administrator, I want to access the Purpose List through an API co
     Given Admin sets the parameters in the path "hub/list".
     Then send Get request for visitorsPurposeList
     Then verifies that the return response for the visitorsPurposeList Api succesfull
+
+

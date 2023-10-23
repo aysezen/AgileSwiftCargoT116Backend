@@ -20,6 +20,7 @@ public class APISteps {
 
     Faker faker = new Faker();
 
+    int id;
 
     @Given("Admin sets the parameters in the path {string}.")
     public void admin_sets_the_parameters_in_the_path(String rawPaths) {
@@ -91,8 +92,51 @@ public class APISteps {
     }
 
 
+    @Given("Hub List endpointi icin gerekli olan path parametreleri set edilir.")
+    public void hub_list_endpointi_icin_gerekli_olan_path_parametreleri_set_edilir() {
+
+        spec.pathParams("ali","hub","veli", "list");
+       // spec.pathParam("ali","hub").pathParam("veli", "list");
 
 
+    }
 
 
+    @Then("Hub List endpointine Get request gonderilir.")
+    public void hubListEndpointineGetRequestGonderilir() {
+
+        response = given().spec(spec).headers("Authorization","Bearer " + token).when().get("/{ali}/{veli}");
+
+        response.prettyPrint();
+    }
+
+    @Then("Donen responsein Status Code'unun {int} ve Response Message bilgisinin Success oldugunu dogrular.")
+    public void donenResponseinStatusCodeUnunVeResponseMessageBilgisininSuccessOldugunuDogrular(int arg0) {
+
+        response.then().assertThat().statusCode(200).body("message",Matchers.equalTo("Success"));
+
+    }
+
+    @Given("Api {string} path parametreleri set edilir")
+    public void apiPathParametreleriSetEdilir(String rawPaths) { // hub/1
+
+        String[] paths = rawPaths.split("/"); // [ "hub" , "1" ]
+
+        StringBuilder tempPath = new StringBuilder("/{");   //     /{
+
+        for (int i = 0; i < paths.length; i++) {
+
+            String key = "pp" + (i+1);    // pp1   pp2
+            String value = paths[i].trim();   //  hub   1
+
+            spec.pathParam(key,value);
+
+            tempPath.append( key + "}/{" );  //   /{pp1}/{pp2}/{pp3}
+        }
+
+        tempPath.deleteCharAt(tempPath.lastIndexOf("{"));
+        tempPath.deleteCharAt(tempPath.lastIndexOf("/"));
+
+        fullPath = tempPath.toString();
+    }
 }
