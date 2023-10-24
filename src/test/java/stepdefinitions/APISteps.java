@@ -1,26 +1,32 @@
 package stepdefinitions;
 
+import Utils.ConfigReader;
+import Utils.ReusableMethods;
 import com.github.javafaker.Faker;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.hamcrest.Matchers;
+import org.json.JSONObject;
 import org.junit.Assert;
+import pojos.Post_HubReqBody;
 
 import static Hooks.Api.spec;
 import static Hooks.Api.token;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class APISteps {
-    String fullPath;
+    public static String fullPath;
     Response response;
-
     Faker faker = new Faker();
-
     int id;
+    String exceptionMesaji = "";
+    public static Post_HubReqBody reqBody;
 
     @Given("Admin sets the parameters in the path {string}.")
     public void admin_sets_the_parameters_in_the_path(String rawPaths) {
@@ -139,4 +145,88 @@ public class APISteps {
 
         fullPath = tempPath.toString();
     }
+
+    @Then("Get request gonderilir.")
+    public void getRequestGonderilir() {
+
+        response = ReusableMethods.getRequest(token);
+
+        response.prettyPrint();
+
+
+
+    }
+
+    @Then("Donen response status kodunun {int} oldugu dogrulanmali")
+    public void donenResponseStatusKodununOlduguDogrulanmali(int statusCode) {
+
+        response.then().assertThat().statusCode(statusCode);
+
+
+    }
+
+    @Then("invalid credentials ile Get request gonderilir")
+    public void invalidCredentialsIleGetRequestGonderilir() {
+
+        try{
+            response = ReusableMethods.getRequest(ConfigReader.getProperty("gecersizToken"));
+        }
+        catch(Exception e){
+            exceptionMesaji = e.getMessage();
+        }
+        System.out.println("exceptionMesaji = " + exceptionMesaji);
+    }
+
+
+    @Then("Donen response status kodunun {int} ve message bilgisinin de Unauthenticated. oldugu dogrulanmali")
+    public void donenResponseStatusKodununVeMessageBilgisininDeUnauthenticatedOlduguDogrulanmali(int arg0) {
+
+         assertTrue(exceptionMesaji.contains("status code: 401"));
+    }
+
+    @Then("Name {string}, phone {string}, address {string}, current balance {string}, status {int} bilgileri ile Post request gonderilir.")
+    public void namePhoneAddressCurrentBalanceStatusBilgileriIlePostRequestGonderilir(String name, String phone, String address, String currentBalance, int status) {
+
+         reqBody = new Post_HubReqBody(name,phone,address,currentBalance,status);
+
+         response = ReusableMethods.postRequest(token,reqBody);
+
+         response.prettyPrint();
+    }
+
+    @Then("Then Donen response status kodunun {int} ve message bilgisinin de {string} oldugu dogrulanmali.")
+    public void thenDonenResponseStatusKodununVeMessageBilgisininDeOlduguDogrulanmali(int statusCode, String message) {
+        /*
+        {
+            "success": true,
+            "message": "Hub is added",
+            "data": {
+                "New Hub ID": 209
+            }
+        }
+ */
+        JSONObject inner = new JSONObject();
+
+        inner.put("New Hub ID", 209);
+
+        JSONObject expData = new JSONObject();
+
+        expData.put("success", true);
+        expData.put("message", "Hub is added");
+        expData.put("data", inner);
+
+        JsonPath respJP = response.jsonPath();
+
+        assertEquals(expData.get("success"), respJP.get("success"));
+        assertEquals(expData.get("message"), respJP.get("message"));
+        assertEquals(200, response.getStatusCode());
+       // assertEquals(expData.getJSONObject("data").get("New Hub ID"), respJP.get("data.New Hub ID"));
+
+
+    }
+
+
+
+
+
 }
