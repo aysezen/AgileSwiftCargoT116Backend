@@ -218,8 +218,8 @@ public class APISteps {
         JsonPath respJP = response.jsonPath();
 
         assertEquals(expData.get("success"), respJP.get("success"));
-        assertEquals(expData.get("message"), respJP.get("message"));
-        assertEquals(200, response.getStatusCode());
+        assertEquals(message, respJP.get("message"));
+        assertEquals(statusCode, response.getStatusCode());
        // assertEquals(expData.getJSONObject("data").get("New Hub ID"), respJP.get("data.New Hub ID"));
 
 
