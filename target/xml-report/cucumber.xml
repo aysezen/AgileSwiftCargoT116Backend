@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<testsuite errors="0" failures="1" name="io.cucumber.core.plugin.JUnitFormatter" skipped="0" tests="1" time="0.991">
-    <testcase classname="Bir yönetici (admin) olarak API bağlantısı üzerinden Hub List'e erişebilmek istiyorum." name="api/hub/list endpoint'ine gecerli authorization bilgileri ile bir GET request gönderildiginde" time="0.316">
-        <failure message="The scenario has pending or undefined step(s)" type="java.lang.Exception"><![CDATA[Given Hub List endpointi icin gerekli olan path parametreleri set edilir....undefined
-Then Hub List endpointine Get request gonderilir............................skipped
+<testsuite errors="0" failures="1" name="io.cucumber.core.plugin.JUnitFormatter" skipped="0" tests="1" time="0.939">
+    <testcase classname="Token Create eden Api" name="_2" time="0.276">
+        <failure message="The scenario has pending or undefined step(s)" type="java.lang.Exception"><![CDATA[Given Token create etmek icin gerekli olan pathparametresi set edilir.......undefined
+Then getToken Post methodu icin gerekli olan ReqBody olusturulur............skipped
+Then getToken icin gerekli olan Request gonderilir..........................skipped
+Then GetToken requesti icin donen Response bodysinden Token degeri alinir...skipped
 ]]></failure>
     </testcase>
 </testsuite>
