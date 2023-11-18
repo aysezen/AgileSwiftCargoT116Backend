@@ -1,8 +1,10 @@
 package Utils;
 
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 import java.util.HashMap;
 
@@ -11,7 +13,10 @@ import static io.restassured.RestAssured.given;
 
 public class Authentication {
 
+    private static RequestSpecification spec;
     public static String generateToken(){
+
+        spec = new RequestSpecBuilder().setBaseUri(ConfigReader.getProperty("base_url")).build();
 
         spec.pathParam("pp1","gettoken");
 
