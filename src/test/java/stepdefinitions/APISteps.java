@@ -1,10 +1,12 @@
 package stepdefinitions;
 
+import Utils.ReusableMethods;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.Assert;
 
@@ -20,6 +22,8 @@ public class APISteps {
     HashMap<String,Object> reqBody;
     Response response;
     JSONObject expData;
+
+    public static String fullPath;
 
     @Given("Token create etmek icin gerekli olan pathparametresi set edilir.")
     public void token_create_etmek_icin_gerekli_olan_pathparametresi_set_edilir() {
@@ -114,5 +118,65 @@ public class APISteps {
         assertEquals( expData.get("updated_at")    , respJP.get("updated_at")    );
 
     }
+    @Given("Api {string} Path Parametreleri set edilir")   //     hub/list
+    public void api_path_parametreleri_set_edilir(String rawpaths) {
 
+       // spec.pathParams("pp1","hub","pp2","list");
+       // spec.pathParam("pp1","hub").pathParam("pp2","list");   => Bu iki ifade ayni isi yapar!
+
+       // spec.pathParam("pp1","hub");
+       // spec.pathParam("pp2","list");   => Bu iki ifade ayni isi yapar!
+
+        // /{pp1}/{pp2}/{.}....
+
+        String [] paths = rawpaths.split("/");
+
+        StringBuilder tempPath = new StringBuilder("/{");
+
+        for (int i = 0; i < paths.length ; i++) {
+
+            String key = "pp" + (i + 1);
+            String value = paths[i];
+
+            spec.pathParam(key,value);
+
+            tempPath.append( key + "}/{" );  // /{pp1}/{pp2}/{pp3}/{
+        }
+
+        tempPath.deleteCharAt(tempPath.lastIndexOf("{"));
+        tempPath.deleteCharAt(tempPath.lastIndexOf("/"));
+
+        fullPath = tempPath.toString();
+
+    }
+    @Then("Get request gonderilir")
+    public void get_request_gonderilir() {
+
+        response = ReusableMethods.getRequest();
+        response.prettyPrint();
+    }
+    @Then("Donen Response'in status code'unun {int} oldugu dogrulanir")
+    public void donen_response_in_status_code_unun_oldugu_dogrulanir(Integer statusCode) {
+
+        response.then().assertThat().statusCode(statusCode);
+
+    }
+
+    @Then("Donen Response Body'sinin success degerinin {string} , message bilgisinin de {string} oldugu dogrulanir")
+    public void donenResponseBodySininSuccessDegerininMessageBilgisininDeOlduguDogrulanir(String success, String message) {
+
+        boolean successbo;
+
+        if(success.contains("true") )
+            {successbo = Boolean.parseBoolean(success.trim());}
+        else
+            {successbo = false;}
+
+        response
+                .then()
+                .assertThat()
+                .body("success", Matchers.equalTo(successbo),"message",Matchers.equalTo(message));
+
+
+    }
 }
