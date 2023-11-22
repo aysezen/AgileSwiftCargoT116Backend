@@ -1,5 +1,6 @@
 package Utils;
 
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
 import static Hooks.API.spec;
@@ -21,4 +22,16 @@ public class ReusableMethods {
         return response;
     }
 
+    public static Response postRequest(Object reqBody){
+
+        response = given()
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header("Authorization","Bearer " + token)
+                .when()
+                .body(reqBody)
+                .post(fullPath);
+
+        return response;
+    }
 }

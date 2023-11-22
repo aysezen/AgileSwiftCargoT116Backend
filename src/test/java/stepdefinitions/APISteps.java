@@ -9,6 +9,7 @@ import io.restassured.response.Response;
 import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.Assert;
+import pojos.HubAddReqBody;
 
 import java.util.HashMap;
 
@@ -175,8 +176,34 @@ public class APISteps {
         response
                 .then()
                 .assertThat()
-                .body("success", Matchers.equalTo(successbo),"message",Matchers.equalTo(message));
+                .body("success", Matchers.equalTo(successbo),
+                              "message",Matchers.equalTo(message));
+    }
 
 
+    @Then("Hub Add Api icin name {string}, phone {string}, address {string} bilgileriyle Post request gonderilir")
+    public void hubAddApiIcinNamePhoneAddressBilgileriylePostRequestGonderilir(String name1, String phone1, String address1) {
+
+    // Request Body hazirlama
+
+        HubAddReqBody reqBody = new HubAddReqBody(name1,phone1,address1);
+
+        response = ReusableMethods.postRequest(reqBody);
+
+        response.prettyPrint();
+
+    }
+
+    @Then("Hub list Response Body icin dogrulama yapilir")
+    public void hubListResponseBodyIcinDogrulamaYapilir() {
+
+        response
+                .then()
+                .assertThat()
+                .body("data.id",Matchers.hasItem(1),
+                        "data.name",Matchers.hasItems("New York City","Los Angeles"),
+                        "data.address",Matchers.hasSize(Matchers.greaterThan(100)),
+                        "data[0].id",Matchers.equalTo(1),
+                        "data[0].name",Matchers.equalTo("New York City"));
     }
 }
